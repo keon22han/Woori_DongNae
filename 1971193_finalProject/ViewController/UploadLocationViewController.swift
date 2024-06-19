@@ -55,9 +55,16 @@ class UploadLocationViewController: UIViewController, UIImagePickerControllerDel
             return
         }
         
+        weak var sv: UIView!
+        sv = SignUpViewController.displaySpinner(onView: self.view)
+        
         DBManager.instance.uploadPlaceInfo(placeImage: self.placeImageView.image!, placeName: self.placeNameTextField.text!, placeDescription: self.placeDescriptionTextField.text!) { success in
+            sv.removeFromSuperview()
             if let success = success {
-                print("success to upload recommanded place info")
+                self.navigationController?.view.showToast(message: "장소 리뷰 등록을 완료하였습니다!", duration: 3.0)
+                self.placeImageView.image = UIImage(systemName:"photo")
+                self.placeNameTextField.text = ""
+                self.placeDescriptionTextField.text = ""
             }
         }
     }

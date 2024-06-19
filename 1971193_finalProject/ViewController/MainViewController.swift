@@ -164,7 +164,7 @@ class MainViewController: UIViewController {
             topContentUserImageView.backgroundColor = .lightGray
             
             let topContentUserNameLabel = UILabel()
-            topContentUserNameLabel.text = suggestedUserInfos[i].name
+            topContentUserNameLabel.text = suggestedUserInfos[i].nickName
             topContentUserNameLabel.translatesAutoresizingMaskIntoConstraints = false
             topContentUserNameLabel.textAlignment = .center
 
@@ -269,6 +269,7 @@ class MainViewController: UIViewController {
 
                 cardImageView.contentMode = .scaleAspectFill
                 cardImageView.layer.cornerRadius = 10
+                cardImageView.tag = row*numberOfColumns + column
                 cardImageView.layer.masksToBounds = true
                 cardImageView.translatesAutoresizingMaskIntoConstraints = false
                 cardImageView.isUserInteractionEnabled = true
