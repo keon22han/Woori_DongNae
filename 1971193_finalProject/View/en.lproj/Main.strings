@@ -1,0 +1,78 @@
+
+/* Class = "UILabel"; text = "        ID :"; ObjectID = "3Mw-7P-aSF"; */
+"3Mw-7P-aSF.text" = "        ID :";
+
+/* Class = "UITextField"; placeholder = "ID:"; ObjectID = "4n0-Xs-xFv"; */
+"4n0-Xs-xFv.placeholder" = "ID:";
+
+/* Class = "UILabel"; text = "    소개 :"; ObjectID = "Bzy-Ut-0FJ"; */
+"Bzy-Ut-0FJ.text" = "    소개 :";
+
+/* Class = "UILabel"; text = "    이름 :"; ObjectID = "EP9-xF-CLn"; */
+"EP9-xF-CLn.text" = "    이름 :";
+
+/* Class = "UITextField"; placeholder = "PW:"; ObjectID = "F5I-XR-KLB"; */
+"F5I-XR-KLB.placeholder" = "PW:";
+
+/* Class = "UIButton"; configuration.title = "Cancel"; ObjectID = "FtQ-RC-TTt"; */
+"FtQ-RC-TTt.configuration.title" = "Cancel";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "FtQ-RC-TTt"; */
+"FtQ-RC-TTt.normalTitle" = "Button";
+
+/* Class = "UIButton"; configuration.title = "Login"; ObjectID = "Hu6-aB-cIF"; */
+"Hu6-aB-cIF.configuration.title" = "Login";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Hu6-aB-cIF"; */
+"Hu6-aB-cIF.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "* PW는 6자리 이상 입력해주세요."; ObjectID = "Jlp-hj-eXg"; */
+"Jlp-hj-eXg.text" = "* PW는 6자리 이상 입력해주세요.";
+
+/* Class = "UIButton"; configuration.title = "Sign In"; ObjectID = "OOg-af-5G6"; */
+"OOg-af-5G6.configuration.title" = "Sign In";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "OOg-af-5G6"; */
+"OOg-af-5G6.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "     PW :"; ObjectID = "PTY-2i-Ru2"; */
+"PTY-2i-Ru2.text" = "     PW :";
+
+/* Class = "UIButton"; configuration.title = "Upload"; ObjectID = "cT2-OV-Sq9"; */
+"cT2-OV-Sq9.configuration.title" = "Upload";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "cT2-OV-Sq9"; */
+"cT2-OV-Sq9.normalTitle" = "Button";
+
+/* Class = "UITabBarItem"; title = "Upload"; ObjectID = "fwc-XS-ZLP"; */
+"fwc-XS-ZLP.title" = "Upload";
+
+/* Class = "UITabBarItem"; title = "Main"; ObjectID = "kG6-DM-1tA"; */
+"kG6-DM-1tA.title" = "Main";
+
+/* Class = "UILabel"; text = "위치 업로드"; ObjectID = "nIw-PV-Wgz"; */
+"nIw-PV-Wgz.text" = "위치 업로드";
+
+/* Class = "UILabel"; text = "아이디가 없으신가요?"; ObjectID = "pFT-Yb-BFW"; */
+"pFT-Yb-BFW.text" = "아이디가 없으신가요?";
+
+/* Class = "UIButton"; configuration.title = "Done!"; ObjectID = "rua-kw-p0E"; */
+"rua-kw-p0E.configuration.title" = "Done!";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "rua-kw-p0E"; */
+"rua-kw-p0E.normalTitle" = "Button";
+
+/* Class = "UITabBarItem"; title = "Setting"; ObjectID = "t1I-oy-HMB"; */
+"t1I-oy-HMB.title" = "Setting";
+
+/* Class = "UILabel"; text = "장소명 : "; ObjectID = "tNq-VD-Myq"; */
+"tNq-VD-Myq.text" = "장소명 : ";
+
+/* Class = "UILabel"; text = "   리뷰 :"; ObjectID = "uRj-dr-Wf0"; */
+"uRj-dr-Wf0.text" = "   리뷰 :";
+
+/* Class = "UITabBarItem"; title = "Map"; ObjectID = "vQf-lh-WSs"; */
+"vQf-lh-WSs.title" = "Map";
+
+/* Class = "UILabel"; text = "닉네임 :"; ObjectID = "zhI-wb-NgK"; */
+"zhI-wb-NgK.text" = "닉네임 :";

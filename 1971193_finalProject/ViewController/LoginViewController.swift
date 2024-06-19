@@ -57,6 +57,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             else {
                 self.navigationController?.view.showToast(message: "로그인에 실패하였습니다.")
             }
+            self.idTextField.text = ""
+            self.pwTextField.text = ""
         }
     }
     
