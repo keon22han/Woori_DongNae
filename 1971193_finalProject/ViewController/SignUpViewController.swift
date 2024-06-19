@@ -15,6 +15,7 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate, U
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var nickNameTextField: UITextField!
+    @IBOutlet weak var userDescriptionTextField: UITextField!
     
     @IBOutlet weak var signupDoneButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
@@ -53,7 +54,7 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate, U
         sv = SignUpViewController.displaySpinner(onView: self.view)
         UserLocationManager.instance.requestLocation { location in
             if let location = location {
-                DBManager.instance.signUpFirebase(email: self.idTextField.text!, password: self.passwordTextField.text!, userInfo: UserInfo(name: self.nameTextField.text, nickName: self.nickNameTextField.text, image: self.userImageView.image, imageURL: "", location: location)) { success in
+                DBManager.instance.signUpFirebase(email: self.idTextField.text!, password: self.passwordTextField.text!, userInfo: UserInfo(name: self.nameTextField.text, nickName: self.nickNameTextField.text, image: self.userImageView.image, imageURL: "", userDescription: self.userDescriptionTextField.text, location: location)) { success in
                     
                     sv.removeFromSuperview()
                     if success {

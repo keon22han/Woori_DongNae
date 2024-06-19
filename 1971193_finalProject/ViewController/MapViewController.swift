@@ -17,35 +17,73 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         mapView.delegate = self
         mapView.register(MKAnnotationView.self, forAnnotationViewWithReuseIdentifier: NSStringFromClass(MKAnnotationView.self))
-        // 지도 초기위치, 확대/축소 설정
-        let initialLocation = CLLocation(latitude: 37.7749, longitude: -122.4194) // sanfrancisco
-        let regionRadius: CLLocationDistance = 10000 // 반경 10km
         
-        centerMapOnLocation(location: initialLocation, radius: regionRadius) // 추후 내 위치로 설정
-        
-        let annotation = CustomPointAnnotation()
-        annotation.title = "San Francisco"
-        annotation.coordinate = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
-        annotation.subtitle = "California, USA"
-        let userInfo = UserInfo(name: "keon", nickName: "keon22han", image: UIImage(named:"roopy"), imageURL: "", location: CLLocation(latitude: 37.7749, longitude: -122.4194))
-        
-        annotation.userInfo = userInfo
-        
-        mapView.addAnnotation(annotation)
+        createPlaceAnnotations()
+        mapView.showsUserLocation = true
+        UserLocationManager.instance.requestLocation() { location in
+            if let location = location {
+                let regionRadius: CLLocationDistance = 100 // 반경 100m
+                self.centerMapOnLocation(location: location, radius: regionRadius)
+            }
+        }
     }
+
     
     func centerMapOnLocation(location: CLLocation, radius: CLLocationDistance) {
         let coordinateRegion = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: radius, longitudinalMeters: radius)
         
-        mapView.setRegion(coordinateRegion, animated: true)
+        DispatchQueue.main.async {
+            self.mapView.setRegion(coordinateRegion, animated: true)
+        }
+    }
+    
+    func createPlaceAnnotation(placeInfo: RecommandedPlaceInfo) {
+        let annotation = CustomPointAnnotation()
+        annotation.placeInfo = placeInfo
+        annotation.title = placeInfo.placeName
+        annotation.coordinate = CLLocationCoordinate2D(latitude: placeInfo.placeLatitude, longitude: placeInfo.placeLongitude)
+        annotation.image = placeInfo.placeImage
+        annotation.subtitle = placeInfo.placeDescription
+        DBManager.instance.getUserInfo(userID: placeInfo.uploadUserID) { user in
+            if let user = user as? UserInfo {
+                annotation.userInfo = user
+                DispatchQueue.main.async {
+                    self.mapView.addAnnotation(annotation)
+                }
+            }
+        }
+    }
+    
+    func createPlaceAnnotations() {
+        DBManager.instance.getPlaces() { places in
+            if let places = places as? [RecommandedPlaceInfo] {
+                for place in places {
+                    DBManager.instance.getCurrentUserInfo() { currUserInfo in
+                        if let currUserInfo = currUserInfo as? UserInfo {
+                            let targetPlaces = FriendRecommender.instance.recommendPlaces(for: currUserInfo, from: places.shuffled(), maxDistance: 10.0, maxPlaces: 10)
+                            
+                            for targetPlace in targetPlaces {
+                                self.createPlaceAnnotation(placeInfo: place)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func mapView(_ mapView: MKMapView, didDeselect annotation: any MKAnnotation) {
+        if let presentedViewController = self.presentedViewController, presentedViewController is BottomSheetViewController {
+            presentedViewController.dismiss(animated: true, completion: nil)
+        }
     }
     
     func mapView(_ mapView: MKMapView, didSelect annotation: any MKAnnotation) {
         let anno : CustomPointAnnotation? = annotation as? CustomPointAnnotation
-        let bottomSheetViewController = BottomSheetViewController(isTouchPassable: true, contentViewController: DetailQuestViewController(userInfo: UserInfo(name: anno?.userInfo.name as? String, nickName: anno?.userInfo.nickName as? String, image: UIImage(named:"roopy"), imageURL: "", location: CLLocation(latitude: 37.7749, longitude: -122.4194))))
-        present(bottomSheetViewController, animated: true)
-        
-        
+        if let presentedViewController = self.presentedViewController, presentedViewController is BottomSheetViewController {
+            presentedViewController.dismiss(animated: true, completion: nil)
+        }
+        showBottomSheet(userInfo: anno!.userInfo, recommandedPlaceInfo: anno!.placeInfo)
     }
     
     // todo : mapView에 보여지는 annotation 설정
@@ -54,7 +92,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             return nil
         }
 
-        let annotationIdentifier = "testAnnotation"
+        let annotationIdentifier = "annotation"
         var annotationView: MKAnnotationView
 
         if let dequeuedAnnotationView = mapView.dequeueReusableAnnotationView(withIdentifier: annotationIdentifier) {
@@ -62,21 +100,22 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             annotationView.annotation = annotation
         } else {
             annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: annotationIdentifier)
+            
             annotationView.canShowCallout = true
             annotationView.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
         }
         
         // test : 어노테이션 뷰에 이미지 설정
-        var image = UIImage(named: "roopy")
-        image = image?.resized(to: CGSize(width: 50, height: 50))
-        annotationView.image = image
-        
+        if let annotation = annotation as? CustomPointAnnotation {
+            let annotationImage : UIImage = annotation.image!
+            annotationView.image = annotationImage.resized(to: CGSize(width: 50, height: 50))
+        }
         return annotationView
     }
     
-    func makeUpOpenAiInformation(jsonData: Data) -> String {
-        let jsonObject =  try! JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: Any]
-        return String(data: jsonData, encoding: .utf8)!
+    public func showBottomSheet(userInfo: UserInfo, recommandedPlaceInfo: RecommandedPlaceInfo) {
+        let bottomSheetViewController = BottomSheetViewController(isTouchPassable: true, contentViewController: DetailPlaceViewController(userInfo: userInfo, placeInfo: recommandedPlaceInfo))
+        present(bottomSheetViewController, animated: true)
     }
 }
 
@@ -91,102 +130,19 @@ extension UIImage {
 
 class CustomPointAnnotation : MKPointAnnotation {
     var userInfo : UserInfo
+    var placeInfo : RecommandedPlaceInfo
+    var image : UIImage?
     
     override init() {
         userInfo = UserInfo()
+        placeInfo = RecommandedPlaceInfo()
         super.init()
     }
     
-    init(initUserInfo: UserInfo) {
+    init(initUserInfo: UserInfo, initPlaceInfo: RecommandedPlaceInfo) {
         userInfo = initUserInfo
+        placeInfo = initPlaceInfo
         super.init()
-    }
-}
-
-// 콘텐츠의 크기가 동적으로 늘어나야 하므로, SelfSizingTableView 구현
-//  - 단, 최대 크기 정하여 일정 크기 이상 늘어나면 사이즈가 maxHeight로 고정되도록 구현
-final class SelfSizingTableView: UITableView {
-    private let maxHeight: CGFloat
-    
-    override var intrinsicContentSize: CGSize {
-        CGSize(width: contentSize.width, height: min(contentSize.height, maxHeight))
-    }
-    
-    init(maxHeight: CGFloat) {
-        self.maxHeight = maxHeight
-        super.init(frame: .zero, style: .grouped)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError()
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        invalidateIntrinsicContentSize()
-    }
-}
-
-// ScrollableViewController: 클라이언트 코드에서 해당 프로토콜에 명시된 인터페이스에 접근
-final class MyViewController: UIViewController, ScrollableViewController {
-    private let label = UILabel()
-    
-    private let tableView = SelfSizingTableView(maxHeight: UIScreen.main.bounds.height * 0.4).then {
-        $0.allowsSelection = false
-        $0.backgroundColor = UIColor.clear
-        $0.separatorStyle = .none
-        $0.bounces = true
-        $0.showsVerticalScrollIndicator = true
-        $0.contentInset = .zero
-        $0.indicatorStyle = .black
-        $0.estimatedRowHeight = 34.0
-        $0.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-    }
-    
-    var scrollView: UIScrollView {
-        self.tableView
-    }
-        
-    init() {
-        super.init(nibName: nil, bundle: nil)
-        
-        label.text = "test"
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        setUpView()
-    }
-    required init?(coder: NSCoder) {
-        fatalError()
-    }
-    
-    private func setUpView() {
-        self.view.addSubview(label)
-        self.view.addSubview(tableView)
-        
-        NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            label.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            label.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 10),
-            label.widthAnchor.constraint(equalToConstant: 100)
-        ])
-        
-        tableView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        tableView.dataSource = self
-    }
-}
-
-extension MyViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        0
-    }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = "cell\(indexPath.row)"
-        return cell
     }
 }
 

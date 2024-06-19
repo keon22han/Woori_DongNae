@@ -31,6 +31,7 @@ extension UIView {
 }
 
 extension UIViewController {
+    
     class func displaySpinner(onView: UIView) -> UIView {
         let spinnerView = UIView.init(frame: onView.bounds)
         
