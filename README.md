@@ -1,5 +1,5 @@
-# iOS-Final-Project
-iOS 기말 프로젝트 "우리 동네"| `1971193 한건희`
+# iOS-Project
+iOS 프로젝트 "우리 동네"| `1971193 한건희`
 
 ## Contents
 > 1. [Login Page](#Login-Page)
